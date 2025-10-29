@@ -13,6 +13,10 @@ import Redesign from "./pages/services/Redesign";
 import Engagement from "./pages/services/Engagement";
 import Analytics from "./pages/services/Analytics";
 import ScrollToTop from "./components/ScrollToTop";
+import AcademyHome from "./pages/academy/AcademyHome";
+import Course from "./pages/academy/Course";
+import Lesson from "./pages/academy/Lesson";
+
 
 // ✅ add these:
 import Terms from "./pages/Terms";
@@ -35,6 +39,10 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/academy" element={<AcademyHome />} />
+<Route path="/academy/course/:courseSlug" element={<Course />} />
+<Route path="/academy/course/:courseSlug/lesson/:lessonSlug" element={<Lesson />} />
+
 
         {/* ✅ new legal pages */}
         <Route path="/terms" element={<Terms />} />

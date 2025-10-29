@@ -18,6 +18,8 @@ export default function NavBar(){
           <NavLink to="/about" className={active}>About</NavLink>
           <NavLink to="/pricing" className={active}>Pricing</NavLink>
           <NavLink to="/contact" className={active}>Contact</NavLink>
+                    <NavLink to="/academy" className={active}>Academy</NavLink>
+
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle />
