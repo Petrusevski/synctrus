@@ -1,3 +1,4 @@
+// src/App.tsx
 import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
@@ -13,12 +14,15 @@ import Engagement from "./pages/services/Engagement";
 import Analytics from "./pages/services/Analytics";
 import ScrollToTop from "./components/ScrollToTop";
 
+// ✅ add these:
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 export default function App() {
   return (
     <>
       <NavBar />
-            <ScrollToTop />
+      <ScrollToTop />
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -31,7 +35,12 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/contact" element={<Contact />} />
+
+        {/* ✅ new legal pages */}
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
+
       <Footer />
     </>
   );
