@@ -62,7 +62,7 @@ export default function Audit() {
       subtitle="A fast, structured diagnostic of mechanics, value exchange, CX, data, and governance to identify ROI opportunities and risks."
       graphic={
         <img
-          src="/src/assets/audit.svg"
+          src="/assets/audit.svg"
           alt="audit graphic"
           className="w-full max-w-sm mx-auto opacity-90"
         />

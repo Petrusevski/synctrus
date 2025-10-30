@@ -15,7 +15,7 @@ export default function Engagement() {
         <div className="relative mx-auto max-w-sm">
           <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-amber-100/50 via-yellow-100/30 to-transparent blur-2xl -z-10" />
           <img
-            src="/src/assets/engagement.svg"
+            src="/assets/engagement.svg"
             alt="engagement graphic"
             className="w-full max-w-sm mx-auto opacity-90"
           />

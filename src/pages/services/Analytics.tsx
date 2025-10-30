@@ -15,7 +15,7 @@ export default function Analytics() {
         <div className="relative mx-auto max-w-sm">
           <div className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-tr from-amber-200/40 via-yellow-200/25 to-transparent -z-10 animate-pulse-slow" />
           <img
-            src="/src/assets/analytics.svg"
+            src="/assets/analytics.svg"
             alt="analytics graphic"
             className="w-full max-w-sm mx-auto opacity-90"
           />

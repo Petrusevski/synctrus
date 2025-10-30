@@ -15,7 +15,7 @@ export default function Redesign() {
         <div className="relative mx-auto max-w-sm">
           <div className="absolute -inset-8 rounded-full blur-3xl bg-gradient-to-t from-yellow-100/50 via-amber-100/40 to-transparent -z-10 animate-pulse-slow" />
           <img
-            src="/src/assets/redesign.svg"
+            src="/assets/redesign.svg"
             alt="redesign graphic"
             className="w-full max-w-sm mx-auto opacity-90"
           />
