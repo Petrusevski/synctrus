@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink } from "react-router-dom";
 import Container from "./ui/Container";
-import ThemeToggle from "./ui/ThemeToggle";
+
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -120,7 +120,6 @@ export default function NavBar() {
         <DesktopNav />
 
         <div className="flex items-center gap-3">
-          <ThemeToggle />
           <a
             href="/contact"
             className="hidden md:inline-flex items-center rounded-xl bg-black text-white px-4 py-2.5 font-semibold border border-black hover:bg-neutral-900"
