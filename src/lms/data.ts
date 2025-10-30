@@ -12,7 +12,7 @@ export type QuizQ = {
   id: string;
   q: string;
   options: string[];
-  answerIndex: number; // index into options[]
+  correct: number; // index into options[]
   explain?: string;
 };
 
@@ -76,7 +76,7 @@ export const courses: Course[] = [
               "Breakage can improve margins but lower perceived value if too high.",
               "Breakage makes accounting impossible."
             ],
-            answerIndex: 2,
+            correct: 2,
             explain:
               "Moderate breakage can improve unit economics, but excessive breakage hurts trust and perceived value."
           },
@@ -89,7 +89,7 @@ export const courses: Course[] = [
               "Gross profit from last quarter.",
               "Total ARPU including VAT."
             ],
-            answerIndex: 1
+            correct: 1
           }
         ]
       },
@@ -111,7 +111,7 @@ export const courses: Course[] = [
               "Moderate breakage can improve margins but too much lowers perceived value",
               "Breakage makes accounting impossible"
             ],
-            answerIndex: 2
+            correct: 2
           },
           {
             id: "program-q2",
@@ -122,7 +122,7 @@ export const courses: Course[] = [
               "Push template design",
               "Coupon color palette"
             ],
-            answerIndex: 1
+            correct: 1
           },
           {
             id: "program-q3",
@@ -133,7 +133,7 @@ export const courses: Course[] = [
               "Issuing points twice per event",
               "Ignoring opt-out state"
             ],
-            answerIndex: 1
+            correct: 1
           },
           {
             id: "program-q4",
@@ -144,7 +144,7 @@ export const courses: Course[] = [
               "Soft landing when a member drops tier",
               "Too many tiers making progression feel unreachable"
             ],
-            answerIndex: 3
+            correct: 3
           }]
       },
       {
@@ -188,7 +188,7 @@ export const courses: Course[] = [
               "Push template design",
               "Coupon color palette"
             ],
-            answerIndex: 1
+            correct: 1
           }
         ]
       },
@@ -225,7 +225,7 @@ export const courses: Course[] = [
               "Be identical across all markets",
               "Eliminate re-qualification"
             ],
-            answerIndex: 1
+            correct: 1
           }
         ]
       },
@@ -287,7 +287,7 @@ export const courses: Course[] = [
               "Issuing points twice per event",
               "Ignoring opt-out state"
             ],
-            answerIndex: 1
+            correct: 1
           }
         ]
       },
