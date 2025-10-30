@@ -3,7 +3,17 @@ import Section from "../components/ui/Section";
 import Heading from "../components/ui/Heading";
 import { Card, CardBody } from "../components/ui/Card";
 import Button from "../components/ui/Button";
-import { Trophy, Layers, Gift, ShieldCheck, Sparkles, LineChart } from "lucide-react";
+import {
+  Trophy,
+  Layers,
+  Gift,
+  ShieldCheck,
+  Sparkles,
+  LineChart,
+  GraduationCap,
+  BookOpen,
+  Rocket,
+} from "lucide-react";
 import EngagementModes from "../components/EngagementModes";
 import Reveal from "../components/Reveal";
 
@@ -221,8 +231,73 @@ export default function Home() {
         </Section>
       </Reveal>
 
-      {/* Engagement Modes */}
+      {/* ---------- ACADEMY SPOTLIGHT (new) ---------- */}
       <Reveal delay={160}>
+        <section className="relative isolate overflow-hidden">
+          {/* glow + gradient background */}
+          <div className="absolute inset-0 -z-10">
+            <div className="h-full w-full bg-gradient-to-br from-fuchsia-500 via-rose-400 to-amber-300 opacity-90" />
+            <div className="pointer-events-none absolute -inset-20 blur-3xl opacity-40 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,.6),transparent_60%)] animate-pulse" />
+          </div>
+
+          <Section className="text-white">
+            <Heading
+              kicker="Academy"
+              title="Level up your loyalty craft"
+              subtitle="Free, practical lessons on mechanics, architecture, automation, and analytics — built from real implementations."
+            />
+
+            {/* Feature stripes */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: <GraduationCap className="h-5 w-5" />,
+                  t: "Loyalty Foundations",
+                  d: "Program types, economics, and KPIs to pick the right model for your margin and audience.",
+                },
+                {
+                  icon: <BookOpen className="h-5 w-5" />,
+                  t: "Program Design & Architecture",
+                  d: "Earn & burn rules, tiers, partners, and guardrails — built for scale and control.",
+                },
+                {
+                  icon: <Rocket className="h-5 w-5" />,
+                  t: "Ops, Automation & Analytics",
+                  d: "Journeys that compound, experimentation, and reporting that drives action.",
+                },
+              ].map((x, i) => (
+                <div
+                  key={x.t}
+                  className="rounded-2xl p-[1px] bg-white/20 hover:bg-white/30 transition"
+                  style={{ transitionDelay: `${60 * i}ms` }}
+                >
+                  <div className="rounded-[14px] bg-white/10 backdrop-blur p-6 h-full">
+                    <div className="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white/20 text-white border border-white/30 mb-3">
+                      {x.icon}
+                    </div>
+                    <h3 className="text-lg font-semibold">{x.t}</h3>
+                    <p className="text-sm text-white/90 mt-1">{x.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button to="/academy" variant="primary" className="!bg-black !border-white hover:!bg-white/10">
+                Explore the Academy
+              </Button>
+              <Button to="/academy" variant="primary" className="!text-white !border-white/70 hover:!bg-white/10">
+                See the curriculum
+              </Button>
+            </div>
+          </Section>
+        </section>
+      </Reveal>
+      {/* ---------- /ACADEMY SPOTLIGHT ---------- */}
+
+      {/* Engagement Modes */}
+      <Reveal delay={200}>
         <EngagementModes />
       </Reveal>
     </main>
