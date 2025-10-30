@@ -16,6 +16,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AcademyHome from "./pages/academy/AcademyHome";
 import Course from "./pages/academy/Course";
 import Lesson from "./pages/academy/Lesson";
+import CaseStudyDetail from "./pages/case-studies/CaseStudyDetail";
 
 
 // ✅ add these:
@@ -43,6 +44,7 @@ export default function App() {
 <Route path="/academy/course/:courseSlug" element={<Course />} />
 <Route path="/academy/course/:courseSlug/lesson/:lessonSlug" element={<Lesson />} />
 
+<Route path="/case-studies/:id" element={<CaseStudyDetail />} />
 
         {/* ✅ new legal pages */}
         <Route path="/terms" element={<Terms />} />
