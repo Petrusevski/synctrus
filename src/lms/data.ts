@@ -17,6 +17,9 @@ import segmentationAndTriggers from "./articles/segmentation-and-triggers";
 import journeysThatCompound from "./articles/journeys-that-compound";
 import experimentationAndCausality from "./articles/experimentation-and-causality";
 import reportingThatDrivesAction from "./articles/reporting-that-drives-action";
+import { article as journeyMapping } from "./articles/journey-mapping";
+
+
 // ---------- Types ----------
 export type QuizQ = {
   id: string;
@@ -931,9 +934,146 @@ quiz: [
     correct: 1
   }
 ]
+
       }
     ]
-  }
+  },
+ {
+  slug: "build-customer-journeys",
+  level: "Intermediate",
+  title: "Build Customer Journeys",
+  subtitle: "Design automated, personalized journeys that guide customers from onboarding to retention.",
+  est: "1.2 hrs",
+  heroEmoji: "🧭",
+  outcomes: [
+    "Master lifecycle mapping and customer segmentation",
+    "Build multi-channel engagement flows",
+    "Detect churn signals and reactivation opportunities"
+  ],
+  syllabus: [
+    {
+      slug: "journey-mapping",
+      title: "Journey Mapping & Lifecycle Design",
+      duration: "14 min",
+      kind: "article"
+    },
+    {
+      slug: "behavioral-triggers",
+      title: "Behavioral Triggers & Frequency Caps",
+      duration: "12 min",
+      kind: "article"
+    },
+    {
+      slug: "journey-orchestration",
+      title: "Multi-Channel Journey Orchestration",
+      duration: "15 min",
+      kind: "article"
+    },
+    {
+      slug: "winback-flows",
+      title: "Reactivation & Win-Back Flows",
+      duration: "10 min",
+      kind: "article"
+    },
+    {
+      slug: "journey-measurement",
+      title: "Measuring Journey Performance",
+      duration: "12 min",
+      kind: "article"
+    }
+  ]
+},
+{
+  slug: "loyalty-automations",
+  level: "Advanced",
+  title: "Loyalty Automations",
+  subtitle: "Turn loyalty rules into living automations with workflows, triggers, and multi-channel logic.",
+  est: "1.1 hrs",
+  heroEmoji: "⚙️",
+  outcomes: [
+    "Automate earn & burn logic across systems",
+    "Implement Make.com and n8n loyalty blueprints",
+    "Add fraud prevention and smart throttling layers"
+  ],
+  syllabus: [
+    {
+      slug: "make-blueprints",
+      title: "Make.com Loyalty Blueprints",
+      duration: "13 min",
+      kind: "article"
+    },
+    {
+      slug: "n8n-loyalty",
+      title: "n8n Loyalty Journeys",
+      duration: "14 min",
+      kind: "article"
+    },
+    {
+      slug: "crm-pos-integration",
+      title: "CRM & POS Integration Layer",
+      duration: "11 min",
+      kind: "article"
+    },
+    {
+      slug: "fraud-detection",
+      title: "Fraud Detection & Velocity Checks",
+      duration: "10 min",
+      kind: "article"
+    },
+    {
+      slug: "scheduling-throttling",
+      title: "Advanced Scheduling & Throttling",
+      duration: "12 min",
+      kind: "article"
+    }
+  ]
+},
+{
+  slug: "ai-loyalty-programs",
+  level: "Advanced",
+  title: "AI for Loyalty Programs",
+  subtitle: "Use machine learning and AI agents to personalize, predict, and optimize loyalty engagement.",
+  est: "1.3 hrs",
+  heroEmoji: "🤖",
+  outcomes: [
+    "Understand predictive segmentation and churn modeling",
+    "Deliver AI-driven offer personalization",
+    "Integrate Context-as-a-Service for loyalty assistants"
+  ],
+  syllabus: [
+    {
+      slug: "predictive-segmentation",
+      title: "Predictive Segmentation Models",
+      duration: "14 min",
+      kind: "article"
+    },
+    {
+      slug: "dynamic-rewards",
+      title: "Dynamic Reward Recommendations",
+      duration: "13 min",
+      kind: "article"
+    },
+    {
+      slug: "ltv-forecasting",
+      title: "LTV Prediction & Cohort Forecasting",
+      duration: "11 min",
+      kind: "article"
+    },
+    {
+      slug: "ai-copy",
+      title: "AI-Assisted Content & Copy",
+      duration: "10 min",
+      kind: "article"
+    },
+    {
+      slug: "caas-loyalty",
+      title: "Context-as-a-Service for Loyalty Agents",
+      duration: "12 min",
+      kind: "article"
+    }
+  ]
+}
+
 ];
 
 export default courses;
