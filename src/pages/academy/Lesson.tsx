@@ -1,20 +1,30 @@
 // src/pages/academy/Lesson.tsx
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Reveal from "../../components/Reveal";
 import { courses } from "../../lms/data";
 import { isCompleted, toggleComplete } from "../../lms/progress";
 import Quiz from "../../components/lms/Quiz";
+import { useAuth } from "@/context/AuthContext";
+import { upsertCourseProgress, maybeAward } from "@/lms/academyStore";
 
 export default function Lesson() {
   const nav = useNavigate();
   const { courseSlug, lessonSlug } = useParams();
+  const { user } = useAuth();
+
+  // local "version" to force re-render after toggling localStorage-based completion
+  const [version, setVersion] = useState(0);
 
   const course = courses.find((c) => c.slug === courseSlug);
   const lesson = course?.syllabus.find((l) => l.slug === lessonSlug);
+
+  // If route params are wrong, bail out early
   if (!course || !lesson) {
     return <main className="px-6 py-16">Lesson not found.</main>;
   }
 
+  // ---------- From here on, course and lesson are non-null ----------
   const thisIndex = course.syllabus.findIndex((l) => l.slug === lesson.slug);
   const prev = course.syllabus[thisIndex - 1];
   const next = course.syllabus[thisIndex + 1];
@@ -33,6 +43,37 @@ export default function Lesson() {
   const goPrev = () => {
     if (prev) nav(`/academy/course/${course.slug}/lesson/${prev.slug}`);
   };
+
+  async function persistProgress(newDoneCount: number) {
+    const pct = Math.round((newDoneCount / total) * 100);
+    if (user) {
+      await upsertCourseProgress(user.id, course!.slug, pct);
+      await maybeAward(user.id, { hasCourse50: pct >= 50, hasCourse100: pct >= 100 });
+    }
+  }
+
+  async function onToggleComplete() {
+    const wasDone = done;
+    // local toggle (stored via progress.ts; likely in localStorage)
+    toggleComplete(course!.slug, lesson!.slug);
+    setVersion((v) => v + 1); // force re-render to recompute derived values
+
+    const newDoneCount = wasDone ? doneCount - 1 : doneCount + 1;
+    await persistProgress(newDoneCount);
+  }
+
+  // If your quiz completion should mark the lesson as done, call this on result
+  async function onQuizResult() {
+    if (!done) {
+      toggleComplete(course!.slug, lesson!.slug);
+      setVersion((v) => v + 1);
+      const newDoneCount = doneCount + 1;
+      await persistProgress(newDoneCount);
+    } else {
+      // Even if already done, you could still persist overallPct if you want
+      await persistProgress(doneCount);
+    }
+  }
 
   return (
     <main className="bg-white">
@@ -93,7 +134,7 @@ export default function Lesson() {
 
               {lesson.content && (
                 <article
-                  className="lesson-prose mt-2"  /* <- fixed typo: 'lesson-prose' */
+                  className="lesson-prose mt-2"
                   dangerouslySetInnerHTML={{ __html: lesson.content }}
                 />
               )}
@@ -108,7 +149,7 @@ export default function Lesson() {
                 </Reveal>
                 <Reveal delay={100}>
                   <div className="rounded-2xl border border-black/10 p-4 md:p-5">
-                    <Quiz qs={lesson.quiz} onResult={() => {}} />
+                    <Quiz qs={lesson.quiz} onResult={() => { void onQuizResult(); }} />
                   </div>
                 </Reveal>
               </>
@@ -141,7 +182,7 @@ export default function Lesson() {
                   </Link>
                 )}
                 <button
-                  onClick={() => toggleComplete(course.slug, lesson.slug)}
+                  onClick={onToggleComplete}
                   className={`ml-auto rounded-full px-4 py-2 text-sm ${
                     done
                       ? "bg-emerald-600 text-white hover:bg-emerald-700"
