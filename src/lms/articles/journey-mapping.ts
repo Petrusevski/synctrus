@@ -1,11 +1,6 @@
-export const article = {
-  slug: "journey-mapping",
-  title: "Journey Mapping & Lifecycle Design",
-  est: "14 min",
-  level: "Intermediate",
-  type: "Article",
-  emoji: "🧭",
-  content: `
+// src/lms/articles/journey-mapping.ts
+export const journeyMapping = `
+
   <h2>Why Journey Mapping Matters</h2>
   <p>
   Every brand has a unique story arc with its customers — from discovery to long-term advocacy.
@@ -70,4 +65,4 @@ export const article = {
     <li>Link emotion, intent, and metric for every lifecycle stage.</li>
   </ul>
   `
-};
+;

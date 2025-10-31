@@ -32,6 +32,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
+
         <Route path="/services/audit" element={<Audit />} />
         <Route path="/services/redesign" element={<Redesign />} />
         <Route path="/services/engagement" element={<Engagement />} />
@@ -45,6 +46,7 @@ export default function App() {
 <Route path="/academy/course/:courseSlug/lesson/:lessonSlug" element={<Lesson />} />
 
 <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
+
 
         {/* ✅ new legal pages */}
         <Route path="/terms" element={<Terms />} />
