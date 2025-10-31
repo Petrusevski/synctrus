@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom"; // ✅ SPA navigation
 import Reveal from "../../components/Reveal";
 import CourseCard from "../../components/lms/CourseCard";
 import { courses } from "../../lms/data";
@@ -339,12 +340,13 @@ export default function AcademyHome() {
 
                 {/* Footer actions */}
                 <div className="mt-5 flex items-center justify-between">
-                  <a
-                    href={`/academy/case-studies/${cs.slug}`}
+                  {/* ⛔ was <a href=...> which caused full reload + auth flicker */}
+                  <Link
+                    to={`/academy/case-studies/${cs.slug}`}
                     className="inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50"
                   >
                     Open Case <span aria-hidden>→</span>
-                  </a>
+                  </Link>
                   <button
                     className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm font-semibold hover:bg-indigo-700"
                     onClick={() => onSubmit(cs.slug)}

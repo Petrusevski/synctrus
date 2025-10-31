@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Reveal from "../../../components/Reveal";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 type Submission = {
   diagnosis: string;
@@ -13,6 +16,9 @@ const SLUG = "retail-fashion-tier-stall";
 const STORAGE_KEY = `case:${SLUG}:draft`;
 
 export default function RetailFashionTierStall() {
+  const { user } = useAuth();
+  const nav = useNavigate();
+
   const [draft, setDraft] = useState<Submission>({
     diagnosis: "",
     interventions: "",
@@ -20,6 +26,10 @@ export default function RetailFashionTierStall() {
     kpis: "",
     risks: "",
   });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [notice, setNotice] = useState<null | { type: "success" | "error"; text: string }>(null);
+  const [result, setResult] = useState<null | { score?: number; status?: string; feedback?: string }>(null);
 
   // Load/save draft to localStorage so students don’t lose work
   useEffect(() => {
@@ -84,16 +94,86 @@ export default function RetailFashionTierStall() {
 
   function saveDraft() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    setNotice({ type: "success", text: "Draft saved locally." });
+    setTimeout(() => setNotice(null), 1500);
   }
 
   function clearDraft() {
     localStorage.removeItem(STORAGE_KEY);
     setDraft({ diagnosis: "", interventions: "", experiment: "", kpis: "", risks: "" });
+    setNotice({ type: "success", text: "Draft cleared." });
+    setTimeout(() => setNotice(null), 1500);
   }
 
-  function submit() {
-    // Wire this to your backend/Supabase later
-    alert("Thanks! Submission received. (Hook this to Supabase later.)");
+  async function submit() {
+    if (!user) {
+      setNotice({ type: "error", text: "Please sign in to submit your solution." });
+      setTimeout(() => {
+        setNotice(null);
+        nav(`/auth/sign-in?next=${encodeURIComponent(location.pathname)}`);
+      }, 800);
+      return;
+    }
+
+    // very light validation
+    const fields = Object.values(draft).map((v) => (v || "").trim()).filter(Boolean);
+    if (fields.length < 3) {
+      setNotice({ type: "error", text: "Please provide at least three sections before submitting." });
+      setTimeout(() => setNotice(null), 2000);
+      return;
+    }
+
+    setSubmitting(true);
+    setNotice(null);
+    setResult(null);
+
+    try {
+      // 1) Insert submission
+      const { data, error } = await supabase
+        .from("academy_case_submissions")
+        .insert([
+          {
+            user_id: user.id,
+            case_slug: SLUG,
+            answers: draft,
+            status: "submitted",
+          },
+        ])
+        .select("id")
+        .single();
+
+      if (error) throw error;
+
+      // 2) Trigger grading (Supabase Edge Function)
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/evaluate-case`;
+      const res = await fetch(functionUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ submission_id: data.id }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || "Evaluation failed.");
+      }
+
+      setResult({
+        score: json.score,
+        status: json.status,
+        feedback: json.feedback_text,
+      });
+
+      // optional: clear local draft after successful submit
+      clearDraft();
+      setNotice({ type: "success", text: "Submitted! Your answer was graded." });
+    } catch (err: any) {
+      console.error(err);
+      setNotice({ type: "error", text: err.message || "Submission failed." });
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setNotice(null), 4000);
+    }
   }
 
   return (
@@ -103,12 +183,12 @@ export default function RetailFashionTierStall() {
         <Reveal>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <a
-                href="/academy"
+              <Link
+                to="/academy"
                 className="text-sm text-neutral-600 hover:text-neutral-800"
               >
                 ← Back to Academy
-              </a>
+              </Link>
               <div className="mt-2 flex items-center gap-3">
                 <div className="h-12 w-12 grid place-content-center rounded-xl bg-neutral-50 border text-2xl">
                   🧥
@@ -286,6 +366,27 @@ export default function RetailFashionTierStall() {
           <div className="rounded-2xl border bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Submit Your Solution</h2>
 
+            {notice && (
+              <div
+                className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+                  notice.type === "success"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : "border-rose-200 bg-rose-50 text-rose-800"
+                }`}
+              >
+                {notice.text}
+              </div>
+            )}
+
+            {result && (
+              <div className="mb-4 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-900 px-4 py-3 text-sm">
+                <div className="font-semibold">
+                  Result: {result.status?.toUpperCase() || "REVIEWED"} — {result.score ?? "—"}/100
+                </div>
+                {result.feedback && <div className="mt-1">{result.feedback}</div>}
+              </div>
+            )}
+
             <Field
               label="1) Diagnosis (root causes)"
               value={draft.diagnosis}
@@ -321,18 +422,24 @@ export default function RetailFashionTierStall() {
               <button
                 className="rounded-xl border px-4 py-2 text-sm font-medium hover:bg-neutral-50"
                 onClick={saveDraft}
+                type="button"
+                disabled={submitting}
               >
                 Save draft
               </button>
               <button
-                className="rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm font-semibold hover:bg-indigo-700"
+                className="rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm font-semibold hover:bg-indigo-700 disabled:opacity-60"
                 onClick={submit}
+                type="button"
+                disabled={submitting}
               >
-                Submit solution
+                {submitting ? "Submitting…" : "Submit solution"}
               </button>
               <button
                 className="rounded-xl bg-neutral-100 text-neutral-700 px-4 py-2 text-sm font-medium hover:bg-neutral-200"
                 onClick={clearDraft}
+                type="button"
+                disabled={submitting}
               >
                 Clear
               </button>
