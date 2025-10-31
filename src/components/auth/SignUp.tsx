@@ -1,130 +1,212 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import AuthLayout from "./AuthLayout";
-import PasswordInput from "./PasswordInput";
-import SocialButtons from "./SocialButtons";
-
-function strength(pw: string) {
-  // very simple heuristic
-  let s = 0;
-  if (pw.length >= 8) s++;
-  if (/[A-Z]/.test(pw)) s++;
-  if (/[a-z]/.test(pw)) s++;
-  if (/[0-9]/.test(pw)) s++;
-  if (/[^A-Za-z0-9]/.test(pw)) s++;
-  return Math.min(s, 5);
-}
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [password, setPassword] = useState("");
-  const [agree, setAgree] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [params] = useSearchParams();
-  const navigate = useNavigate();
 
-  const next = useMemo(() => params.get("next") || "/account", [params]);
-  const score = strength(password);
-  const labels = ["Very weak", "Weak", "Okay", "Good", "Strong"];
+  // Common fields
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  async function onSubmit(e: React.FormEvent) {
+  // User type: b2b or b2c
+  const [userType, setUserType] = useState<"b2c" | "b2b">("b2c");
+
+  // B2C fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  // B2B fields
+  const [companyName, setCompanyName] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
+  const [country, setCountry] = useState("");
+
+  async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
-    if (!agree) {
-      setMsg("Please agree to the Terms and Privacy Policy.");
-      return;
-    }
-    setBusy(true); setMsg(null);
-    const { error } = await supabase.auth.signUp({
+    setLoading(true);
+    setMsg(null);
+
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin }
     });
-    setBusy(false);
-    if (error) setMsg(error.message);
-    else setMsg("Check your inbox to confirm your account. You can close this tab.");
+
+    if (error) {
+      setMsg(error.message);
+      setLoading(false);
+      return;
+    }
+
+    const user = data.user;
+    if (!user) {
+      setMsg("Signup succeeded, but user not created. Check email verification.");
+      setLoading(false);
+      return;
+    }
+
+    // Insert profile
+    const profileData: any = {
+      id: user.id,
+      user_type: userType,
+      created_at: new Date().toISOString(),
+    };
+
+    if (userType === "b2c") {
+      profileData.first_name = firstName;
+      profileData.last_name = lastName;
+    } else {
+      profileData.company_name = companyName;
+      profileData.industry = industry;
+      profileData.vat_number = vatNumber;
+      profileData.country = country;
+    }
+
+    const { error: pErr } = await supabase.from("profiles").insert(profileData);
+    if (pErr) {
+      setMsg(`Profile error: ${pErr.message}`);
+    } else {
+      setMsg("Account created successfully! Check your email for confirmation.");
+      nav("/auth/sign-in");
+    }
+
+    setLoading(false);
   }
 
   return (
-    <AuthLayout
-      title="Create your account"
-      subtitle="Start learning and submit solutions to real-world loyalty problems."
-      footer={
-        <p className="text-sm text-neutral-600">
-          Already have an account? <Link to="/auth/sign-in" className="font-medium underline">Sign in</Link>
+    <main className="min-h-screen flex items-center justify-center bg-neutral-50 p-6">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
+        <h1 className="text-2xl font-bold text-center mb-1">Create Account</h1>
+        <p className="text-center text-neutral-600 mb-6">
+          Join our platform — for individuals or businesses.
         </p>
-      }
-    >
-      <form onSubmit={onSubmit} className="space-y-3">
-        <input
-          className="w-full rounded-xl border px-4 py-3"
-          placeholder="Full name"
-          value={fullName}
-          onChange={(e)=>setFullName(e.target.value)}
-          required
-          autoComplete="name"
-        />
-        <input
-          className="w-full rounded-xl border px-4 py-3"
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-          required
-          autoComplete="email"
-        />
-        <div className="space-y-1">
-          <PasswordInput value={password} onChange={setPassword} />
-          <div className="h-2 rounded bg-neutral-100">
-            <div
-              className="h-2 rounded transition-all"
-              style={{
-                width: `${(score / 5) * 100}%`,
-                background:
-                  score <= 2 ? "#ef4444" : score === 3 ? "#f59e0b" : "#10b981",
-              }}
+
+        <form onSubmit={handleSignUp} className="space-y-4">
+          {/* Type Selector */}
+          <div className="flex justify-center gap-4 mb-2">
+            <button
+              type="button"
+              onClick={() => setUserType("b2c")}
+              className={`px-4 py-2 rounded-full border text-sm ${
+                userType === "b2c" ? "bg-black text-white" : "hover:bg-neutral-100"
+              }`}
+            >
+              Personal
+            </button>
+            <button
+              type="button"
+              onClick={() => setUserType("b2b")}
+              className={`px-4 py-2 rounded-full border text-sm ${
+                userType === "b2b" ? "bg-black text-white" : "hover:bg-neutral-100"
+              }`}
+            >
+              Business
+            </button>
+          </div>
+
+          {/* Shared fields */}
+          <div>
+            <label className="block text-sm text-neutral-600 mb-1">Email</label>
+            <input
+              type="email"
+              className="w-full rounded-xl border px-4 py-3"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
-          <p className="text-xs text-neutral-600">
-            Password strength: <b>{labels[Math.max(0, score - 1)] || "Very weak"}</b>
+          <div>
+            <label className="block text-sm text-neutral-600 mb-1">Password</label>
+            <input
+              type="password"
+              className="w-full rounded-xl border px-4 py-3"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Conditional fields */}
+          {userType === "b2c" ? (
+            <>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-sm text-neutral-600 mb-1">First name</label>
+                  <input
+                    className="w-full rounded-xl border px-4 py-3"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm text-neutral-600 mb-1">Last name</label>
+                  <input
+                    className="w-full rounded-xl border px-4 py-3"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm text-neutral-600 mb-1">Company Name</label>
+                <input
+                  className="w-full rounded-xl border px-4 py-3"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-neutral-600 mb-1">Industry</label>
+                <input
+                  className="w-full rounded-xl border px-4 py-3"
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-sm text-neutral-600 mb-1">VAT Number</label>
+                  <input
+                    className="w-full rounded-xl border px-4 py-3"
+                    value={vatNumber}
+                    onChange={(e) => setVatNumber(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm text-neutral-600 mb-1">Country</label>
+                  <input
+                    className="w-full rounded-xl border px-4 py-3"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-black text-white py-3 font-semibold hover:bg-neutral-900"
+            disabled={loading}
+          >
+            {loading ? "Creating..." : "Sign up"}
+          </button>
+
+          {msg && <p className="text-center text-sm text-neutral-700">{msg}</p>}
+
+          <p className="text-center text-sm text-neutral-600 mt-3">
+            Already have an account?{" "}
+            <Link to="/auth/sign-in" className="underline">
+              Sign in
+            </Link>
           </p>
-        </div>
-
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="mt-1"
-            checked={agree}
-            onChange={(e)=>setAgree(e.target.checked)}
-          />
-          <span className="text-neutral-700">
-            I agree to the <Link to="/terms" className="underline">Terms</Link> and{" "}
-            <Link to="/privacy" className="underline">Privacy Policy</Link>.
-          </span>
-        </label>
-
-        <button
-          className="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 disabled:opacity-50"
-          disabled={busy}
-        >
-          {busy ? "Creating account…" : "Create account"}
-        </button>
-
-        {msg && <p className="text-sm mt-1 {msg.startsWith('Check') ? 'text-emerald-700' : 'text-rose-600'}">{msg}</p>}
-      </form>
-
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-white px-2 text-xs text-neutral-500">or</span>
-        </div>
+        </form>
       </div>
-
-      <SocialButtons email={email} />
-    </AuthLayout>
+    </main>
   );
 }
